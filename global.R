@@ -19,8 +19,7 @@ traffic_nyc <- traffic_nyc %>% select(-X)
 
 nyc_shape <- readOGR('C:/Users/MDrozd/Downloads/dashboardApp/r_shiny_dashboard/nyc_boroughs_shapefiles/nyc_shape.shp')
 nyc <- read.csv('C:/Users/MDrozd/Downloads/dashboardApp/r_shiny_dashboard/nyc_shape_data.csv')
-nyc <- nyc %>% select(-X)
-nyc_shape@data <- nyc
+nyc_shape@data <- nyc %>% select(-X)
 
 tseries_df <- read.csv('C:/Users/MDrozd/Downloads/dashboardApp/r_shiny_dashboard/tseries.csv')
 tseries_df <- tseries_df %>% select(-X) %>% mutate(Date = as.Date(as.character(Date)))
