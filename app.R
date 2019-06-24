@@ -22,7 +22,7 @@ ui <- dashboardPage(
       tabName = 'main',
       fluidRow(box(
         width = 5,
-        title = 'Choose Year',
+        title = 'Year',
         color = 'red',
         sliderInput(
           "map_yr",
@@ -54,7 +54,7 @@ ui <- dashboardPage(
       fluidRow(
         column(4, box(
           width = 4,
-          title = 'Choose Time Period',
+          title = 'Time Period',
           color='blue',
           selectizeInput(
             "freq",
@@ -65,7 +65,7 @@ ui <- dashboardPage(
         )),
         column(4, box(
           width = 4,
-          title = 'Choose Category',
+          title = 'Category',
           color='blue',
           selectizeInput(
             "cat",
@@ -77,7 +77,7 @@ ui <- dashboardPage(
         )),
         column(4, box(
           width = 4,
-          title= 'Choose Year',
+          title= 'Year',
           color='blue',
           selectizeInput(
             "yr",
@@ -89,7 +89,7 @@ ui <- dashboardPage(
         )),
         column(4, box(
           width = 4,
-          title= 'Sort Top Period',
+          title= 'Sort Top Period/Category',
           color='blue',
           selectizeInput(
             "top",
@@ -122,7 +122,7 @@ ui <- dashboardPage(
                                                        "Exponential" = 'e',
                                                        "Running" = 'r'),
                                         selected = 's'))),
-              column(3,box(title = 'Moving Average Window',
+              column(4,box(title = 'Moving Average Window',
                            color = 'green',
                            sliderInput("ma_n",
                                        '',
@@ -132,17 +132,26 @@ ui <- dashboardPage(
                                        step = 1,
                                        animate =
                                          animationOptions(interval = 1, loop = TRUE,playButton = 'Play',pauseButton = 'Pause')))),
-              column(3,box(title= 'ARMA Forecast',
+              column(3,box(title= 'Model Forecast',
                            color ='green',
-                           radioButtons("cats",'',
-                                        choices = list('AR' = 'ar',
-                                                       'MA' = 'ma'),
-                                        selected = NULL)))
+                           radioButtons("ar_ma",'',
+                                        choices = list('Autoregressive' = 'ar',
+                                                       'Moving Average' = 'ma'),
+                                        selected = 'ar'))),
+              column(4,box(title='AR/MA Model Order',
+                           color = 'green',
+                           sliderInput('arma_n',
+                                       '',
+                                       min = 0,
+                                       max = 12,
+                                       value = 12,
+                                       step = 1
+                                       )))
             ),
             fluidRow(box(
               width=16,
               color='green',
-              title='Citations Series Smoothing',
+              title='Traffic Citations Series Smoothing',
               ribbon=F,
               title_side='top right',
               plotlyOutput('series',height=700)
@@ -269,15 +278,35 @@ server <- shinyServer(function(input, output, session) {
     
   })
   
-
-  output$series <- renderPlotly({
+  data3 <- reactive({ 
     
+    if(input$ar_ma=='ar'){
+      
+      data3 <- as.data.frame(forecast(arima(tseries_df$Count,c(as.numeric(input$arma_n),1,0),include.mean = T),h=12))
+      # as.data.frame(forecast(arima(tseries_df$Count,c(1,1,0),include.mean = T),h=12))[,1]
+      
+    }else if(input$ar_ma=='ma'){
+     
+      data3 <- as.data.frame(forecast(arima(tseries_df$Count,c(0,1,as.numeric(input$arma_n)),include.mean = T),h=12))
+        # as.data.frame(forecast(arima(tseries_df$Count,c(0,1,1),include.mean = T),h=12))
+    }
+    
+    
+  })
+  output$series <- renderPlotly({
+   
+    data3 = data3()
+   
+    model_trace <- c(rep(NA,48),data3[,1])
+    lower_se <- c(rep(NA,48),data3[,2])
+    upper_se <- c(rep(NA,48),data3[,3])
     
     
     plot_ly(data=tseries_df,x=~Date,y=~Count,type='scatter',mode='lines+markers',name = 'Citations') %>% 
-      add_trace(y=movavg(tseries_df$Count,as.numeric(input$ma_n),as.character(input$ma)),name='Smoothed',mode='lines+markers')
-      
-      
+      add_trace(y=movavg(tseries_df$Count,as.numeric(input$ma_n),as.character(input$ma)),name='Smoothed',mode='lines+markers') %>% 
+      add_trace(y=model_trace,name='Point Forecast',mode='lines') %>% 
+      add_trace(y=lower_se,name = '80% Lower Confidence',mode='lines') %>% 
+      add_trace(y=upper_se,name = '80% Upper Confidence',mode='lines')
       
       
       

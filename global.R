@@ -24,7 +24,7 @@ nyc <- nyc %>% select(-X)
 nyc_shape@data <- nyc
 
 tseries_df <- read.csv('C:/Users/MDrozd/Downloads/dashboardApp/r_shiny_dashboard/tseries.csv')
-
+tseries_df <- tseries_df %>% select(-X) %>% mutate(Date = as.Date(as.character(Date)))
 
 # 
 # 
@@ -37,7 +37,11 @@ tseries_df <- read.csv('C:/Users/MDrozd/Downloads/dashboardApp/r_shiny_dashboard
 # tidyr::unite(.,col='Date',Year,Mon,sep='-') %>% mutate(Date = as.Date(paste0(Date,'-01'))) %>%
 # group_by(Date) %>% summarise(Count=n())
 # 
-# write.csv(tseries_df, 'tseries.csv')
+# datevec <- paste0('2018-',01:12,'-01')
+# countvec <- c(rep(NA,12))
+# 
+# tseries_df <- data.frame(Date = append(tseries_df$Date,as.Date(datevec)), Count = append(tseries_df$Count,countvec))
+#write.csv(tseries_df, 'tseries.csv')
 #
 # par(mfrow=c(2,1))
 # count_df <- tseries_df$Count
@@ -48,7 +52,7 @@ tseries_df <- read.csv('C:/Users/MDrozd/Downloads/dashboardApp/r_shiny_dashboard
 # pacf(diff(log(count_df)))
 # 
 #arima(tseries_df$Count,c(1,1,0),xreg = 1:length(count_df))
-arima.fit <- arima(count_df,c(1,1,0),include.mean = T)
+#arima.fit <- arima(count_df,c(1,1,0),include.mean = T)
 #arima.cast <- forecast(arima.fit,h = 12)
 # arima.cast <- arima.cast$mean
 # arima.trace <- as.data.frame(arima.cast)
