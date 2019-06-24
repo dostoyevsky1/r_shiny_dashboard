@@ -20,7 +20,7 @@ ui <- dashboardPage(
     selected = 1,
     tabItem(
       tabName = 'main',
-      fluidRow(box(
+      fluidRow(column(5),column(5,box(
         width = 5,
         title = 'Year',
         color = 'red',
@@ -33,7 +33,7 @@ ui <- dashboardPage(
           step = 1,
           animate =
             animationOptions(interval = 1, loop = TRUE)
-        ))
+        )))
       ),
       fluidRow(
         box(
@@ -102,7 +102,7 @@ ui <- dashboardPage(
       fluidRow(
         box(
           width = 16,
-          color = "black",
+          color = "blue",
           title = 'Traffic Citations Explorer',
           ribbon = F,
           title_side = "top right",
@@ -122,7 +122,7 @@ ui <- dashboardPage(
                                                        "Exponential" = 'e',
                                                        "Running" = 'r'),
                                         selected = 's'))),
-              column(4,box(title = 'Moving Average Window',
+              column(5,box(title = 'Moving Average Window',
                            color = 'green',
                            sliderInput("ma_n",
                                        '',
@@ -138,7 +138,7 @@ ui <- dashboardPage(
                                         choices = list('Autoregressive' = 'ar',
                                                        'Moving Average' = 'ma'),
                                         selected = 'ar'))),
-              column(4,box(title='AR/MA Model Order',
+              column(5,box(title='AR/MA Model Order',
                            color = 'green',
                            sliderInput('arma_n',
                                        '',

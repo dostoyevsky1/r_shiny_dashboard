@@ -14,7 +14,6 @@ library(forecast)
 library(pracma)
 
 
-
 traffic_nyc <- read.csv('C:/Users/MDrozd/Downloads/traffic_nyc.csv')
 traffic_nyc <- traffic_nyc %>% select(-X)
 
