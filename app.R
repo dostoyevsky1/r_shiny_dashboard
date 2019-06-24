@@ -3,7 +3,8 @@ ui <- dashboardPage(
   dashboardSidebar(color = 'black', inverted = T,
     sidebarMenu(
       menuItem(tabName = 'main','Map',icon=icon('map outline')),
-      menuItem(tabName = 'dist', 'Charts', icon=icon('chart bar outline'))
+      menuItem(tabName = 'dist', 'Charts', icon=icon('chart bar outline')),
+      menuItem(tabName = 'cast', 'Series', icon=icon(''))
       
     )
   ),
@@ -12,9 +13,11 @@ ui <- dashboardPage(
       selected = 1,
       tabItem(
         tabName = 'main',
-                      fluidRow(width=5,height=1,align='center',sliderInput("map_yr",'',
+                      fluidRow(width=5,height=1,align='center',
+                               sliderInput("map_yr",'',
                                            min = 2014, max = 2017,
-                                           value = 2014)),
+                                           value = 2014,step=1,animate =
+                                             animationOptions(interval = 1, loop = TRUE))),
                        fluidRow(box( width=16,
           title = 'NYC Traffic Citations', color='red', ribbon=F,title_side='top right',
           leafletOutput("map",height=800)
@@ -55,17 +58,25 @@ ui <- dashboardPage(
 
 server <- shinyServer(function(input, output, session) {
 
-  data1 <- reactive({ 
-
-    nyc_shape@data %>% mutate(tckt_cn = Y2014) %>% head() 
-
+  data1 <- reactive({
+  if(input$map_yr == '2014'){
+    nyc_shape@data %>% mutate(tckt_cn = Y2014) %>% head() %>% as.data.frame()
+  }else if(input$map_yr == '2015'){
+    nyc_shape@data %>% mutate(tckt_cn = Y2015) %>% head() %>% as.data.frame()
+  }else if(input$map_yr == '2016'){
+    nyc_shape@data %>% mutate(tckt_cn = Y2016) %>% head() %>% as.data.frame()
+  }else if(input$map_yr == '2017'){
+    nyc_shape@data %>% mutate(tckt_cn = Y2017) %>% head() %>% as.data.frame()
+  }
+    
   })
-  
+
   
   
   
   output$map <- renderLeaflet({
-
+    nyc_shape@data <- data1()
+    
     pal=colorBin("YlOrRd", domain=nyc_shape@data$tckt_cn)
     leaflet(nyc_shape) %>%
       addProviderTiles(provider = 'CartoDB.Positron') %>%

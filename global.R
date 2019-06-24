@@ -14,7 +14,7 @@ library(forecast)
 
 
 
-traffic_nyc <- read.csv('C:/Users/MDrozd/Downloads/dashboardApp/r_shiny_dashboard/traffic_nyc.csv')
+traffic_nyc <- read.csv('C:/Users/MDrozd/Downloads/traffic_nyc.csv')
 traffic_nyc <- traffic_nyc %>% select(-X)
 nyc_shape <- readOGR('C:/Users/MDrozd/Downloads/dashboardApp/r_shiny_dashboard/nyc_boroughs_shapefiles/nyc_shape.shp')
 nyc <- read.csv('C:/Users/MDrozd/Downloads/dashboardApp/r_shiny_dashboard/nyc_shape_data.csv')
@@ -63,4 +63,4 @@ nyc_shape@data <- nyc
 #
 # plot_ly(data=new_df,x=~Date,y=~Count,type='scatter',mode='lines') %>%
 # add_trace(y=~Forecast,mode='lines')
- write.csv(new_df, 'arma_forecast.csv')
+# write.csv(new_df, 'arma_forecast.csv')
