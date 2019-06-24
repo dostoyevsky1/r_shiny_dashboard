@@ -1,0 +1,160 @@
+---
+title: "Data Pre-Processing for Shiny Dashboard Project"
+author: "Michael Drozdov"
+output: html_document
+---
+```{r setup, include=T, echo= F}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#Libraries
+```{r }
+
+# library(ggplot2)
+# library(dplyr)
+# library(tidyr)
+# library(plotly)
+# library(RColorBrewer)
+# library(leaflet)
+# library(rgdal)
+```
+
+# DATA LOADING 
+
+### Dataset obtained from https://www.kaggle.com/new-york-state/nys-traffic-tickets-issued-four-year-window
+```r{ }
+
+# traffic1 <- read.csv('./traffic-tickets-issued-four-year-window.csv',header=T,stringsAsFactors = ,nrow=2)
+# traffic_cols <- colnames(traffic1)
+# rm(traffic1)
+# traffic <- read.csv('./traffic-tickets-issued-four-year-window.csv',header=F, stringsAsFactors = F,col.names = traffic_cols)
+# 
+# 
+# traffic2 <- na.omit(traffic2)
+# traffic2 <- traffic %>% filter(Gender=='F' | Gender == 'M')
+# traffic2 <- traffic2 %>% rename('Vmonth' = Violation.Month,
+#                                 'Description' = Violation.Description,
+#                                 'Code' = Violation.Charged.Code,
+#                                 'Vyear'=Violation.Year,
+#                                 'Vday' = Violation.Day.of.Week,
+#                                 'Age' = Age.at.Violation,
+#                                 'License' = State.of.License
+#                                 )
+# 
+# 
+# traffic_nyc <- traffic2 %>% filter(Court == 'QUEENS NORTH TVB'|
+#                       Court == 'QUEENS SOUTH TVB'|
+#                       Court == 'BRONX TVB'|
+#                       Court == 'BROOKLYN SOUTH TVB'|
+#                       Court == 'BROOKLYN NORTH TVB'|
+#                       Court == 'RICHMOND TVB'|
+#                       Court == 'MANHATTAN NORTH TVB'|
+#                       Court == 'MANHATTAN SOUTH TVB')
+# 
+# 
+# traffic_nyc <- traffic_nyc %>% mutate(Month = ifelse(Vmonth == 12,'Dec',ifelse(
+#   Vmonth == 11, 'Nov', ifelse(
+#     Vmonth == 10, 'Oct', ifelse(
+#       Vmonth == 9, 'Sep', ifelse(
+#         Vmonth == 8, 'Aug', ifelse(
+#           Vmonth == 7, 'Jul', ifelse(
+#             Vmonth == 6, 'Jun', ifelse(
+#               Vmonth == 5, 'May', ifelse(
+#                 Vmonth == 4, 'Apr', ifelse(
+#                   Vmonth == 3, 'Mar', ifelse(
+#                     Vmonth == 2, 'Feb', ifelse(
+#                       Vmonth == 1, 'Jan', NA)
+#                   )
+#                 )
+#               )
+#             )
+#           )
+#         )
+#       )
+#     )
+#   )
+# )
+# ))
+# 
+# 
+# traffic_nyc <- traffic_nyc %>% mutate(Court = ifelse(Court == 'QUEENS NORTH TVB'|
+#                                         Court == 'QUEENS SOUTH TVB', 'Queens',ifelse(
+#                                           Court == 'BROOKLYN SOUTH TVB'|
+#                                             Court == 'BROOKLYN NORTH TVB', 'Brooklyn',ifelse(
+#                                               Court == 'MANHATTAN NORTH TVB'|
+#                                                 Court == 'MANHATTAN SOUTH TVB', 'Manhattan',ifelse(
+#                                                   Court == 'BRONX TVB', 'Bronx', ifelse(
+#                                                     Court == 'RICHMOND TVB', 'Staten-Island', NA
+#                                                   )
+#                                                 )
+#                                             )
+#                                         )))
+# 
+# 
+# 
+# traffic_nyc <- traffic_nyc %>% select(-Source)
+# 
+# 
+# traffic_nyc <- traffic_nyc %>% mutate(Description = ifelse(Description == 'DISOBEYED TRAFFIC DEVICE', 'Disobeyed Traffic Device',ifelse(
+#   Description == 'SPEED IN ZONE 11-30', 'Speeding', ifelse(
+#     Description == 'OPER MV WHILE USING PORTABLE ELEC DEV', 'Portable Device',ifelse(
+#       Description == 'SIDEWINGS/SIDEWINDOWS/NON/TRANSPARENT', 'Non-transparent Windows',ifelse(
+#         Description == 'OPERATING MV MOBILE PHONE', 'Portable Device', ifelse(
+#           Description == 'NO LAP/SHOULDER HARNESS OR DJ VIO', 'No Seatbelt', ifelse(
+#             Description == 'FLD TO STOP AT STOP SIGN', 'Ran Stop Sign', ifelse(
+#               Description == 'NYC REDLIGHT', 'Ran Red Light', ifelse(
+#                 Description == 'FLD YIELD PEDEST NYC', 'Failed to Yield', ifelse(
+#                   Description == 'UNLICENSED GT 60DAYS', 'No License', ifelse(
+#                     Description == 'IMPROPER TURN','Improper Turn', ifelse(
+#                       Description == 'IMPROPER SIGNAL','Improper Signal',ifelse(
+#                         Description == 'OPERATING W/O INSURANCE', 'No Insurance',ifelse(
+#                           Description == 'SPD-UNPSTD 11-30 NYC','Speeding',ifelse(
+#                             Description == 'INSUFF HEADLIGHTS','No Headlights On',ifelse(
+#                               Description == 'NYC BIKE/SKATE RDLGT','Ran Red on Bike',ifelse(
+#                                 Description == 'INADEQUATE OR NO STOP LAMPS','No Stop Lights',ifelse(
+#                                   Description == 'UNLICENSED OPERATOR','No License', ifelse(
+#                                     Description == 'IMPROPER RIGHT TURN','Improper Right Turn', ifelse(
+#                                       Description == 'PLATE MISSING/INSECURE/DIRTY','Missing Plates', ifelse(
+#                                         Description == 'FLD PRESENT DOC -NYC','Incomplete Documentation', ifelse(
+#                                           Description == 'SPEED IN ZONE 31+', 'Speeding', ifelse(
+#                                             Description == 'U-TRN BUSIN DIST NYC','Wrong U-Turn', ifelse(
+#                                               Description == 'NO SEAT BELT ADULT','No Seatbelt', ifelse(
+#                                                 Description == 'MOVED FROM LANE UNSAFELY/WEAVING', 'Unsafe Lane Departure', Description
+#                                               )
+#                                             )
+#                                           )
+#                                         )
+#                                       )
+#                                     )
+#                                   )
+#                                 )
+#                               )
+#                             )
+#                           )
+#                         )
+#                       )
+#                     )
+#                   ))
+#               )
+#             )
+#           )
+#         )
+#       )
+#     )
+#   )
+# )
+# ))
+# 
+# 
+# traffic_nyc <- traffic_nyc %>% rename('Offense' = Description, 'Weekly'=Vday,'Monthly'=Month,
+#                                       'Agency'=Police.Agency,'Borough'=Court,'State'=License,'Year' = Vyear)
+# 
+# traffic_nyc <- traffic_nyc %>% filter(Age != "")
+# 
+# 
+# 
+# traffic_nyc <- traffic_nyc %>% select(-Vmonth,-Code)
+# 
+# write.csv(traffic_nyc,'./traffic_nyc.csv')
+
+```
