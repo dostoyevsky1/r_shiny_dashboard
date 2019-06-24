@@ -1,55 +1,155 @@
 ui <- dashboardPage(
-  dashboardHeader(color = 'grey',title = 'NYC Traffic Citations',inverted=T),
-  dashboardSidebar(color = 'black', inverted = T,
+  dashboardHeader(color = 'grey',
+                  title = 'NYC Traffic Citations',
+                  inverted = T),
+  dashboardSidebar(
+    color = 'black',
+    inverted = T,
     sidebarMenu(
-      menuItem(tabName = 'main','Map',icon=icon('map outline')),
-      menuItem(tabName = 'dist', 'Charts', icon=icon('chart bar outline')),
-      menuItem(tabName = 'cast', 'Series', icon=icon(''))
+      menuItem(tabName = 'main', 'Map', icon = icon('map outline')),
+      menuItem(
+        tabName = 'dist',
+        'Charts',
+        icon = icon('chart bar outline')
+      ),
+      menuItem(tabName = 'cast', 'Series', icon = icon('chart line'))
       
     )
   ),
-  dashboardBody(
-    tabItems(
-      selected = 1,
-      tabItem(
-        tabName = 'main',
-                      fluidRow(width=5,height=1,align='center',
-                               sliderInput("map_yr",'',
-                                           min = 2014, max = 2017,
-                                           value = 2014,step=1,animate =
-                                             animationOptions(interval = 1, loop = TRUE))),
-                       fluidRow(box( width=16,
-          title = 'NYC Traffic Citations', color='red', ribbon=F,title_side='top right',
-          leafletOutput("map",height=800)
-                       )
+  dashboardBody(tabItems(
+    selected = 1,
+    tabItem(
+      tabName = 'main',
+      fluidRow(box(
+        width = 5,
+        title = 'Choose Year',
+        color = 'red',
+        sliderInput(
+          "map_yr",
+          '',
+          min = 2014,
+          max = 2017,
+          value = 2014,
+          step = 1,
+          animate =
+            animationOptions(interval = 1, loop = TRUE)
+        ))
+      ),
+      fluidRow(
+        box(
+          width = 16,
+          title = 'NYC Total Traffic Citations Map',
+          color = 'red',
+          ribbon = F,
+          title_side = 'top right',
+          leafletOutput("map", height = 800)
+        )
         
-              )
+      )
+    )
+    
+    ,
+    tabItem(
+      tabName = 'dist',
+      fluidRow(
+        column(4, box(
+          width = 4,
+          title = 'Choose Time Period',
+          color='blue',
+          selectizeInput(
+            "freq",
+            label = tags$h4(''),
+            choices = list('Weekly', 'Monthly', 'Year', 'Static'),
+            selected = 'Weekly'
           )
-        
-      ,
-      tabItem(
-        tabName = 'dist',
-        fluidRow(column(4,box(width=4,
-                     selectizeInput("freq",label=tags$h4('Choose Time Period'),choices = list('Weekly','Monthly','Year','Static'),selected = 'Weekly'))),
-                  column(4,box(width=4,
-                         selectizeInput("cat",label=tags$h4('Choose Category'),choices = list('Age','Gender','Offense',
-                                                                                                  'Borough','State','Agency'),selected = 'Age'))),
-                 column(4,box(width=4,
-                              selectizeInput("yr",label=tags$h4('Choose Year'),choices = list('Year',2014,2015,
-                                                                                              2016,2017),selected = 'Year'))),
-                 column(4,box(width=4,
-                              selectizeInput("top",label=tags$h4('Sort Top'),choices = list(1,3,5,10,20),selected = 20)))
-                 ),
-        fluidRow(box(width=16,
-              title = "Weekly Citations",
-              color = "red", ribbon = F, title_side = "top right",
-                     plotlyOutput("barplot1",height=700)
-              )
+        )),
+        column(4, box(
+          width = 4,
+          title = 'Choose Category',
+          color='blue',
+          selectizeInput(
+            "cat",
+            label = tags$h4(''),
+            choices = list('Age', 'Gender', 'Offense',
+                           'Borough', 'State', 'Agency'),
+            selected = 'Age'
           )
+        )),
+        column(4, box(
+          width = 4,
+          title= 'Choose Year',
+          color='blue',
+          selectizeInput(
+            "yr",
+            label = tags$h4(''),
+            choices = list('Year', 2014, 2015,
+                           2016, 2017),
+            selected = 'Year'
+          )
+        )),
+        column(4, box(
+          width = 4,
+          title= 'Sort Top Period',
+          color='blue',
+          selectizeInput(
+            "top",
+            label = tags$h4(''),
+            choices = list(1, 3, 5, 10, 20),
+            selected = 20
+          )
+        ))
+      ),
+      fluidRow(
+        box(
+          width = 16,
+          color = "black",
+          title = 'Traffic Citations Explorer',
+          ribbon = F,
+          title_side = "top right",
+          plotlyOutput("barplot1", height = 700)
         )
       )
-        )
-      )
+    ),
+    tabItem(tabName = 'cast',
+            fluidRow(
+              column(3,box(title = 'Moving Average',
+                           color = 'green',
+                           radioButtons("ma",'', 
+                                        choices = list("Simple" = 's', 
+                                                       "Triangular" = 't', 
+                                                       "Weighted" = 'w',
+                                                       "Modified" = 'm',
+                                                       "Exponential" = 'e',
+                                                       "Running" = 'r'),
+                                        selected = 's'))),
+              column(3,box(title = 'Moving Average Window',
+                           color = 'green',
+                           sliderInput("ma_n",
+                                       '',
+                                       min = 2,
+                                       max = 45,
+                                       value = 2,
+                                       step = 1,
+                                       animate =
+                                         animationOptions(interval = 1, loop = TRUE,playButton = 'Play',pauseButton = 'Pause')))),
+              column(3,box(title= 'ARMA Forecast',
+                           color ='green',
+                           radioButtons("cats",'',
+                                        choices = list('AR' = 'ar',
+                                                       'MA' = 'ma'),
+                                        selected = NULL)))
+            ),
+            fluidRow(box(
+              width=16,
+              color='green',
+              title='Citations Series Smoothing',
+              ribbon=F,
+              title_side='top right',
+              plotlyOutput('series',height=700)
+            ))
+            )
+  ))
+)
 
 
 
@@ -73,11 +173,15 @@ server <- shinyServer(function(input, output, session) {
 
   
   
-  
+  nyc_shape@data 
   output$map <- renderLeaflet({
     nyc_shape@data <- data1()
     
-    pal=colorBin("YlOrRd", domain=nyc_shape@data$tckt_cn)
+    pal=colorBin(ifelse(input$map_yr =='2014','YlOrRd',ifelse(
+      input$map_yr =='2015','YlGnBu',ifelse(
+        input$map_yr =='2016', 'YlGn','RdPu'))),
+          domain=nyc_shape@data$tckt_cn)
+    
     leaflet(nyc_shape) %>%
       addProviderTiles(provider = 'CartoDB.Positron') %>%
       addPolygons(
@@ -129,7 +233,6 @@ server <- shinyServer(function(input, output, session) {
     
     
     
-    
   })
   
   
@@ -151,7 +254,7 @@ server <- shinyServer(function(input, output, session) {
       layout(
         plot_bgcolor = '#FFFFFF',
         paper_bgcolor = '#FFFFFF',
-        title = 'Traffic Citations Explorer',
+        # title = 'Traffic Citations Explorer',
         xaxis = list(title = '', color = '#000'),
         yaxis = list(title = 'Total Number of Citations', color = '#000'),
         title = list(color = '#000'),
@@ -165,6 +268,22 @@ server <- shinyServer(function(input, output, session) {
     
     
   })
+  
+
+  output$series <- renderPlotly({
+    
+    
+    
+    plot_ly(data=tseries_df,x=~Date,y=~Count,type='scatter',mode='lines+markers',name = 'Citations') %>% 
+      add_trace(y=movavg(tseries_df$Count,as.numeric(input$ma_n),as.character(input$ma)),name='Smoothed',mode='lines+markers')
+      
+      
+      
+      
+      
+      
+    
+    })
   
   
 })
