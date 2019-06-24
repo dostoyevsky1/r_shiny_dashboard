@@ -1,3 +1,6 @@
+
+source("./global.R")
+
 ui <- dashboardPage(
   dashboardHeader(color = 'grey',
                   title = 'NYC Traffic Citations',
@@ -27,9 +30,9 @@ ui <- dashboardPage(
         sliderInput(
           "map_yr",
           '',
-          min = 2014,
+          min = 2015,
           max = 2017,
-          value = 2014,
+          value = 2015,
           step = 1,
           animate =
             animationOptions(interval = 1, loop = TRUE)
@@ -38,7 +41,7 @@ ui <- dashboardPage(
       fluidRow(
         box(
           width = 16,
-          title = 'NYC Total Traffic Citations Map',
+          title = 'NYC Total Traffic Citations',
           color = 'red',
           ribbon = F,
           title_side = 'top right',
@@ -82,7 +85,7 @@ ui <- dashboardPage(
           selectizeInput(
             "yr",
             label = tags$h4(''),
-            choices = list('Year', 2014, 2015,
+            choices = list('Year', 2015,
                            2016, 2017),
             selected = 'Year'
           )
@@ -94,7 +97,7 @@ ui <- dashboardPage(
           selectizeInput(
             "top",
             label = tags$h4(''),
-            choices = list(1, 3, 5, 10, 20),
+            choices = list(1, 3, 5, 10, 20, 30, 50),
             selected = 20
           )
         ))
@@ -168,9 +171,7 @@ ui <- dashboardPage(
 server <- shinyServer(function(input, output, session) {
 
   data1 <- reactive({
-  if(input$map_yr == '2014'){
-    nyc_shape@data %>% mutate(tckt_cn = Y2014) %>% head() %>% as.data.frame()
-  }else if(input$map_yr == '2015'){
+    if(input$map_yr == '2015'){
     nyc_shape@data %>% mutate(tckt_cn = Y2015) %>% head() %>% as.data.frame()
   }else if(input$map_yr == '2016'){
     nyc_shape@data %>% mutate(tckt_cn = Y2016) %>% head() %>% as.data.frame()
@@ -186,9 +187,8 @@ server <- shinyServer(function(input, output, session) {
   output$map <- renderLeaflet({
     nyc_shape@data <- data1()
     
-    pal=colorBin(ifelse(input$map_yr =='2014','YlOrRd',ifelse(
-      input$map_yr =='2015','YlGnBu',ifelse(
-        input$map_yr =='2016', 'YlGn','RdPu'))),
+    pal=colorBin(ifelse(input$map_yr =='2015','YlGnBu',ifelse(
+        input$map_yr =='2016', 'YlGn','RdPu')),
           domain=nyc_shape@data$tckt_cn)
     
     leaflet(nyc_shape) %>%
